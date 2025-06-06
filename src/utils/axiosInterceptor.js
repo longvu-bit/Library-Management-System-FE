@@ -4,6 +4,12 @@ import { interceptorLoadingElements } from './formatters'
 
 let axiosInstance = axios.create()
 
+axiosInstance.defaults.baseURL = 'http://localhost:8017/api'
+
+axiosInstance.defaults.timeout = 1000 * 60 * 10
+
+axiosInstance.defaults.withCredentials = true
+
 axiosInstance.interceptors.request.use(
   (config) => {
     // kỹ thuật chặn spam click call api nhiều (true là inactive ko cho phép click)

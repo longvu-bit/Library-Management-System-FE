@@ -1,6 +1,33 @@
 import { Link } from 'react-router'
+import { useNavigate } from 'react-router'
+import { useForm } from 'react-hook-form'
+import { loginAPI } from '../apis/auth'
+import { toast } from 'react-toastify'
 
 const Login = () => {
+  const navigate = useNavigate()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
+
+  const login = (data) => {
+    const { email, password } = data
+
+    toast
+      .promise(loginAPI({ email, password }), {
+        pending: 'Logging in...',
+      })
+      .then((res) => {
+        localStorage.setItem('accessToken', res.accessToken)
+        localStorage.setItem('refreshToken', res.refreshToken)
+        localStorage.setItem('user', JSON.stringify(res.user))
+        toast.success('Đăng nhập thành công!')
+        navigate('/')
+      })
+  }
+
   return (
     <div>
       <section className="bg-white min-h-screen">
@@ -18,12 +45,19 @@ const Login = () => {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900">
                 Đăng nhập tài khoản
               </h1>
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit(login)}>
                 <div>
                   <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">
                     Email
                   </label>
                   <input
+                    {...register('email', {
+                      required: true,
+                      pattern: {
+                        value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message: 'Email không hợp lệ',
+                      },
+                    })}
                     type="email"
                     name="email"
                     id="email"
@@ -31,6 +65,11 @@ const Login = () => {
                     placeholder="name@company.com"
                     required
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.email.message || 'Email là bắt buộc'}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label
@@ -40,6 +79,13 @@ const Login = () => {
                     Mật khẩu
                   </label>
                   <input
+                    {...register('password', {
+                      required: true,
+                      minLength: {
+                        value: 6,
+                        message: 'Mật khẩu phải có ít nhất 6 ký tự',
+                      },
+                    })}
                     type="password"
                     name="password"
                     id="password"
@@ -47,6 +93,11 @@ const Login = () => {
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                     required
                   />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.password.message || 'Mật khẩu là bắt buộc'}
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-start">
