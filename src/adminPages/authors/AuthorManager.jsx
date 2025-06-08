@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Search,
   Edit,
@@ -13,132 +14,124 @@ import {
   Eye,
 } from 'lucide-react'
 
+import {
+  fetchAllAuthorsAPI,
+  createAuthorAPI,
+  updateAuthorAPI,
+  deleteAuthorAPI,
+} from '../../apis/admin'
+import { useNavigate, useSearchParams } from 'react-router'
+
+import { debouncedSearch } from '../../customHook/debounceSearch'
+
+import AddOrUpdateAuthorModal from './AddOrUpdateAuthorModal'
+import { toast } from 'react-toastify'
+import { formatDate } from '../../utils/formatters'
+
 const AuthorManager = () => {
-  const [authors, setAuthors] = useState([
-    {
-      id: 1,
-      name: 'Nguyễn Văn A',
-      bio: 'Tác giả chuyên về lĩnh vực công nghệ thông tin và lập trình. Có nhiều năm kinh nghiệm trong phát triển phần mềm.',
-      addedDate: '2024-01-15',
-    },
-    {
-      id: 2,
-      name: 'Dale Carnegie',
-      bio: "Nhà văn và diễn giả nổi tiếng về phát triển bản thân. Tác phẩm nổi tiếng nhất là 'Đắc Nhân Tâm'.",
-      addedDate: '2024-01-10',
-    },
-    {
-      id: 3,
-      name: 'Trần Thị B',
-      bio: 'Chuyên gia về React và phát triển web hiện đại. Tác giả của nhiều cuốn sách về JavaScript và React.',
-      addedDate: '2024-01-20',
-    },
-    {
-      id: 4,
-      name: 'Adam Khoo',
-      bio: 'Doanh nhân và tác giả sách về giáo dục, phát triển bản thân. Chuyên gia về kỹ năng học tập hiệu quả.',
-      addedDate: '2024-01-12',
-    },
-    {
-      id: 5,
-      name: 'Lê Văn C',
-      bio: 'Tác giả trẻ chuyên về thiết kế UI/UX và trải nghiệm người dùng. Có nhiều bài viết về design thinking.',
-      addedDate: '2024-01-05',
-    },
-    {
-      id: 6,
-      name: 'Robert C. Martin',
-      bio: "Chuyên gia về Clean Code và Software Engineering. Tác giả của 'Clean Code' và 'Clean Architecture'.",
-      addedDate: '2024-01-08',
-    },
-  ])
+  const navigate = useNavigate()
 
-  const [searchTerm, setSearchTerm] = useState('')
-  const [sortOrder, setSortOrder] = useState(null)
-  const [sortField, setSortField] = useState('addedDate')
+  let [searchParams] = useSearchParams()
+  const page = Number(searchParams.get('page')) || 1
 
-  const handleEdit = (id) => {
-    console.log('Edit author:', id)
-    // Implement edit functionality
+  const [authors, setAuthors] = useState([])
+  const [totalAuthors, setTotalAuthors] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [editingAuthor, setEditingAuthor] = useState(null)
+
+  const [searchAuthor, setSearchAuthor] = useState('')
+  const debouncedAuthorSearch = debouncedSearch(searchAuthor, 500)
+
+  useEffect(() => {
+    navigate(`/admin/authors?page=1&search=${debouncedAuthorSearch}`)
+  }, [navigate, debouncedAuthorSearch])
+
+  useEffect(() => {
+    fetchAllAuthorsAPI(page, debouncedAuthorSearch).then((res) => {
+      setAuthors(res.authors)
+      setTotalAuthors(res.totalDocuments)
+      setTotalPages(res.totalPages)
+    })
+  }, [page, debouncedAuthorSearch])
+
+  const handleCreateOrUpdateAuthor = (name, bio, dateOfBirth, idEdit = null) => {
+    //call api
+    if (idEdit) {
+      toast
+        .promise(updateAuthorAPI({ name, bio, dateOfBirth }, idEdit), {
+          pending: 'Updating author...',
+        })
+        .then((res) => {
+          setAuthors((prev) =>
+            prev.map((author) => {
+              if (author._id == idEdit) author = res
+              return author
+            }),
+          )
+          toast.success('Cập nhật thành công')
+        })
+    } else {
+      toast
+        .promise(createAuthorAPI({ name, bio, dateOfBirth }), {
+          pending: 'Creating new author...',
+        })
+        .then((res) => {
+          setAuthors((prev) => [res, ...prev])
+          toast.success('Thêm mới thành công')
+        })
+    }
+
+    console.log(authors)
+  }
+
+  const handleOpenModalEdit = (author) => {
+    setEditingAuthor(author)
+    setShowAddModal(true)
   }
 
   const handleDelete = (id) => {
-    setAuthors(authors.filter((author) => author.id !== id))
+    if (confirm('Sếp chắc chứ ?')) {
+      toast
+        .promise(deleteAuthorAPI(id), {
+          pending: 'Deleting author...',
+        })
+        .then(() => {
+          setAuthors(authors.filter((author) => author._id !== id))
+          toast.success('Xóa thành công')
+        })
+    }
+    return
   }
 
   const handleView = (id) => {
     console.log('View author details:', id)
-    // Implement view details functionality
   }
-
-  const handleAddAuthor = () => {
-    console.log('Add new author')
-    // Implement add author functionality
-  }
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN')
-  }
-
-  const filteredAndSortedAuthors = authors
-    .filter(
-      (author) =>
-        author.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        author.bio.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    .sort((a, b) => {
-      if (!sortOrder) return 0
-
-      let valueA, valueB
-      if (sortField === 'addedDate') {
-        valueA = new Date(a.addedDate).getTime()
-        valueB = new Date(b.addedDate).getTime()
-      } else {
-        valueA = a[sortField].toLowerCase()
-        valueB = b[sortField].toLowerCase()
-      }
-
-      if (sortField === 'addedDate') {
-        return sortOrder === 'asc' ? valueA - valueB : valueB - valueA
-      } else {
-        return sortOrder === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA)
-      }
-    })
-
-  const handleSort = (field) => {
-    if (sortField === field) {
-      if (sortOrder === null || sortOrder === 'desc') {
-        setSortOrder('asc')
-      } else {
-        setSortOrder('desc')
-      }
-    } else {
-      setSortField(field)
-      setSortOrder('asc')
-    }
-  }
-
-  const getSortIcon = (field) => {
-    if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
-    if (sortOrder === 'asc') return <ArrowUp className="h-4 w-4" />
-    if (sortOrder === 'desc') return <ArrowDown className="h-4 w-4" />
-    return <ArrowUpDown className="h-4 w-4" />
-  }
-
-  const totalAuthors = authors.length
 
   return (
-    <div className="author-manager  mx-auto p-6">
+    <div className="author-manager  mx-auto p-6 z-0">
+      {/* Show and hide modal create author */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Quản lý tác giả</h1>
         <button
-          onClick={handleAddAuthor}
+          onClick={() => setShowAddModal(true)}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
         >
           <Plus className="h-4 w-4 mr-2" />
           Thêm tác giả
         </button>
       </div>
+      {showAddModal && (
+        <AddOrUpdateAuthorModal
+          onClose={() => {
+            setShowAddModal(false)
+            if (editingAuthor) setEditingAuthor(null)
+          }}
+          onSubmit={handleCreateOrUpdateAuthor}
+          authorEdit={editingAuthor}
+        />
+      )}
 
       {/* Statistics Card */}
       <div className="mb-6">
@@ -160,8 +153,8 @@ const AuthorManager = () => {
           <input
             type="text"
             placeholder="Tìm kiếm theo tên tác giả hoặc tiểu sử..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchAuthor}
+            onChange={(e) => setSearchAuthor(e.target.value)}
             className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -173,16 +166,16 @@ const AuthorManager = () => {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
+                  Stt
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center space-x-2">
                     <span>Tên tác giả</span>
                     <button
-                      onClick={() => handleSort('name')}
+                      // onClick={() => handleSort('name')}
                       className="p-1 rounded-md hover:bg-gray-200 focus:outline-none"
                     >
-                      {getSortIcon('name')}
+                      <ArrowUpDown />
                     </button>
                   </div>
                 </th>
@@ -191,12 +184,9 @@ const AuthorManager = () => {
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center space-x-2">
-                    <span>Ngày thêm</span>
-                    <button
-                      onClick={() => handleSort('addedDate')}
-                      className="p-1 rounded-md hover:bg-gray-200 focus:outline-none"
-                    >
-                      {getSortIcon('addedDate')}
+                    <span>Ngày sinh</span>
+                    <button className="p-1 rounded-md hover:bg-gray-200 focus:outline-none">
+                      <ArrowUpDown />
                     </button>
                   </div>
                 </th>
@@ -206,10 +196,10 @@ const AuthorManager = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAndSortedAuthors.map((author) => (
-                <tr key={author.id} className="hover:bg-gray-50 transition-colors duration-200">
+              {authors.map((author, index) => (
+                <tr key={author._id} className="hover:bg-gray-50 transition-colors duration-200">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">#{author.id}</div>
+                    <div className="text-sm font-medium text-gray-900">{index + 1}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -235,26 +225,26 @@ const AuthorManager = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{formatDate(author.addedDate)}</div>
+                    <div className="text-sm text-gray-900">{formatDate(author?.dateOfBirth)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => handleView(author.id)}
+                        onClick={() => handleView(author._id)}
                         className="p-1.5 border border-gray-300 rounded-md text-green-600 hover:text-green-800 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500"
                         title="Xem chi tiết"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleEdit(author.id)}
+                        onClick={() => handleOpenModalEdit(author)}
                         className="p-1.5 border border-gray-300 rounded-md text-blue-600 hover:text-blue-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         title="Chỉnh sửa"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(author.id)}
+                        onClick={() => handleDelete(author._id)}
                         className="p-1.5 border border-gray-300 rounded-md text-red-600 hover:text-red-800 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
                         title="Xóa"
                       >
@@ -268,18 +258,63 @@ const AuthorManager = () => {
           </table>
         </div>
 
-        {filteredAndSortedAuthors.length === 0 && (
+        {authors.length === 0 && (
           <div className="text-center py-12">
             <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">
-              {searchTerm ? 'Không tìm thấy tác giả phù hợp' : 'Chưa có tác giả nào trong hệ thống'}
+              {searchAuthor
+                ? 'Không tìm thấy tác giả phù hợp'
+                : 'Chưa có tác giả nào trong hệ thống'}
             </p>
           </div>
         )}
       </div>
 
       <div className="mt-6 text-center text-sm text-gray-600">
-        Hiển thị: {filteredAndSortedAuthors.length} / {authors.length} tác giả
+        Hiển thị: {authors.length} / {authors.length} tác giả
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6 flex justify-center items-center space-x-2">
+        {/* Previous */}
+        <button
+          onClick={() => page > 1 && navigate(`/admin/authors?page=${page - 1}`)}
+          disabled={page === 1}
+          className={`px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-100 focus:outline-none ${
+            page === 1 ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+        >
+          Trước
+        </button>
+
+        {/* Page numbers */}
+        {[...Array(totalPages)].map((_, index) => {
+          const pageNum = index + 1
+          return (
+            <button
+              key={pageNum}
+              onClick={() => navigate(`/admin/authors?page=${pageNum}`)}
+              className={`px-3 py-1 rounded-md border ${
+                pageNum === page
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'border-gray-300 hover:bg-gray-100'
+              } focus:outline-none`}
+            >
+              {pageNum}
+            </button>
+          )
+        })}
+
+        {/* Next */}
+        <button
+          onClick={() => page < totalPages && navigate(`/admin/authors?page=${page + 1}`)}
+          disabled={page === totalPages}
+          className={`px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-100 focus:outline-none ${
+            page === totalPages ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+        >
+          Tiếp
+        </button>
       </div>
     </div>
   )

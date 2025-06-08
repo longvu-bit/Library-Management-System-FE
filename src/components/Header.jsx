@@ -9,10 +9,22 @@ import {
   faSignOut,
   faUser,
 } from '@fortawesome/free-solid-svg-icons'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
+
+import { logoutAPI } from '../apis/auth'
 
 const Header = () => {
-  const user = { name: 'John Doe' }
+  const user = JSON.parse(localStorage.getItem('user'))
+
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logoutAPI()
+    localStorage.removeItem('user')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('accessToken')
+    navigate('/login')
+  }
 
   return (
     <header className="flex flex-col">
@@ -46,7 +58,7 @@ const Header = () => {
             {user ? (
               <div className="relative group">
                 <Link to={'/profile'} className="p-2">
-                  <FontAwesomeIcon icon={faUser} /> UserName
+                  <FontAwesomeIcon icon={faUser} /> {user?.name}
                 </Link>
                 {/* Dropdown xuất hiện khi hover */}
                 <ul className="absolute left-0  mt-2 hidden group-hover:block bg-white rounded shadow-lg z-10 min-w-[200px]">
@@ -67,9 +79,12 @@ const Header = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/logout" className="block px-4 py-2 text-gray-700 hover:bg-blue-100">
+                    <p
+                      className="block px-4 py-2 text-gray-700 hover:bg-blue-100"
+                      onClick={handleLogout}
+                    >
                       <FontAwesomeIcon icon={faSignOut} /> Logout
-                    </Link>
+                    </p>
                   </li>
                 </ul>
               </div>

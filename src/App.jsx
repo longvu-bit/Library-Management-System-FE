@@ -14,7 +14,7 @@ import BorrowBookManager from './adminPages/BorrowBookManager'
 import UserManager from './adminPages/UserManager'
 import BookManager from './adminPages/BookManager'
 import PublisherManager from './adminPages/PublisherManager'
-import AuthorManager from './adminPages/AuthorManager'
+import AuthorManager from './adminPages/authors/AuthorManager'
 import CategoryManager from './adminPages/CategoryManager'
 
 function App() {
