@@ -66,7 +66,7 @@ const Header = () => {
                 <ul className="absolute left-0  mt-2 hidden group-hover:block bg-white rounded shadow-lg z-10 min-w-[200px]">
                   <li>
                     <Link
-                      to="/profile"
+                      to="/user/profile"
                       className="block px-4 py-2  text-gray-700 hover:bg-blue-100"
                     >
                       <FontAwesomeIcon icon={faUser} /> Account
@@ -104,42 +104,6 @@ const Header = () => {
             <Link to={'/'} className="text-white px-4 py-2 hover:bg-blue-700 transition-colors">
               Trang chủ
             </Link>
-          </li>
-          <li className="relative group">
-            <Link
-              to={'/books'}
-              className="text-white px-4 py-2 hover:bg-blue-700 transition-colors"
-            >
-              Danh mục
-            </Link>
-
-            {/* Dropdown xuất hiện khi hover */}
-            <ul className="absolute left-0  mt-2 hidden group-hover:block bg-white rounded shadow-lg z-10 min-w-[200px]">
-              <li>
-                <Link
-                  to="/books/fiction"
-                  className="block px-4 py-2  text-gray-700 hover:bg-blue-100"
-                >
-                  Sách tiểu thuyết
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/books/science"
-                  className="block px-4 py-2 text-gray-700 hover:bg-blue-100"
-                >
-                  Khoa học
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/books/children"
-                  className="block px-4 py-2 text-gray-700 hover:bg-blue-100"
-                >
-                  Thiếu nhi
-                </Link>
-              </li>
-            </ul>
           </li>
 
           <li>
