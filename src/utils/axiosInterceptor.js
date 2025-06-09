@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { interceptorLoadingElements } from './formatters'
+import { logoutAPI, refreshTokenAPI } from '../apis/auth'
 
 let axiosInstance = axios.create()
 
@@ -24,6 +26,7 @@ axiosInstance.interceptors.request.use(
   },
 )
 
+let refreshTokenPromise = null
 axiosInstance.interceptors.response.use(
   (response) => {
     // kỹ thuật chặn spam click call api nhiều (true là inactive ko cho phép click)
@@ -32,7 +35,40 @@ axiosInstance.interceptors.response.use(
     return response
   },
   (error) => {
-    // Xử lý lỗi phản hồi tập trung
+    interceptorLoadingElements(false)
+
+    // UNAUTHORIZED
+    if (error.response?.status === 401) {
+      logoutAPI()
+    }
+
+    const originalRequests = error.config
+    if (error.response?.status === 410 && originalRequests) {
+      if (!refreshTokenPromise) {
+        refreshTokenPromise = refreshTokenAPI()
+          .then((res) => {
+            return res?.accessToken
+          })
+          .catch((_error) => {
+            logoutAPI()
+            return Promise.reject(_error)
+          })
+          .finally(() => {
+            refreshTokenPromise = null
+          })
+      }
+
+      return refreshTokenPromise.then((accessToken) => {
+        /**
+         * B1: Doi voi du an can luu accessToken vao localStorage hoac o dau do thi viet them o day
+         * Hien tai ko can vi BE su dung httpOnly
+         */
+
+        // B2: Return lai axios instance ket hop voi originalRequests de goi lai nhung api ban dau bi loi
+        return axiosInstance(originalRequests)
+      })
+    }
+
     let errorMessage = error?.message
     if (error.response?.data?.message) {
       errorMessage = error.response?.data?.message

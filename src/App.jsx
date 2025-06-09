@@ -10,12 +10,12 @@ import HistoryBorrowBook from './pages/HistoryBorrowBook'
 
 // Admin
 import AdminLayout from './layouts/AdminLayout'
-import BorrowBookManager from './adminPages/BorrowBookManager'
-import UserManager from './adminPages/UserManager'
-import BookManager from './adminPages/BookManager'
-import PublisherManager from './adminPages/PublisherManager'
+import BorrowBookManager from './adminPages/borrows/BorrowBookManager'
+import UserManager from './adminPages/users/UserManager'
+import BookManager from './adminPages/books/BookManager'
+import PublisherManager from './adminPages/publishers/PublisherManager'
 import AuthorManager from './adminPages/authors/AuthorManager'
-import CategoryManager from './adminPages/CategoryManager'
+import CategoryManager from './adminPages/categories/CategoryManager'
 
 function App() {
   return (

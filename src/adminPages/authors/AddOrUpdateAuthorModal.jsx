@@ -44,7 +44,9 @@ const AddOrUpdateAuthorModal = ({ onClose, onSubmit, authorEdit }) => {
             >
               <X />
             </button>
-            <h2 className="text-xl font-bold mb-4">Thêm tác giả mới</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {authorEdit ? 'Cập nhật tác giả' : 'Thêm tác giả mới'}
+            </h2>
 
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Tên tác giả</label>
