@@ -27,6 +27,7 @@ import { debouncedSearch } from '../../customHook/debounceSearch'
 import AddOrUpdateAuthorModal from './AddOrUpdateAuthorModal'
 import { toast } from 'react-toastify'
 import { formatDate } from '../../utils/formatters'
+import Pagination from '../../components/Pagination'
 
 const AuthorManager = () => {
   const navigate = useNavigate()
@@ -38,6 +39,10 @@ const AuthorManager = () => {
   const [totalAuthors, setTotalAuthors] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
 
+  //sort
+  const [sortBy, setSortBy] = useState('')
+  const [order, setOrder] = useState('')
+
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingAuthor, setEditingAuthor] = useState(null)
 
@@ -45,16 +50,18 @@ const AuthorManager = () => {
   const debouncedAuthorSearch = debouncedSearch(searchAuthor, 500)
 
   useEffect(() => {
-    navigate(`/admin/authors?page=1&search=${debouncedAuthorSearch}`)
-  }, [navigate, debouncedAuthorSearch])
+    navigate(
+      `/admin/authors?page=1&search=${debouncedAuthorSearch}&sortBy=${sortBy}&order=${order}`,
+    )
+  }, [navigate, debouncedAuthorSearch, sortBy, order])
 
   useEffect(() => {
-    fetchAllAuthorsAPI(page, debouncedAuthorSearch).then((res) => {
+    fetchAllAuthorsAPI(page, debouncedAuthorSearch, sortBy, order).then((res) => {
       setAuthors(res.authors)
       setTotalAuthors(res.totalDocuments)
       setTotalPages(res.totalPages)
     })
-  }, [page, debouncedAuthorSearch])
+  }, [page, debouncedAuthorSearch, sortBy, order])
 
   const handleCreateOrUpdateAuthor = (name, bio, dateOfBirth, idEdit = null) => {
     //call api
@@ -82,8 +89,6 @@ const AuthorManager = () => {
           toast.success('Thêm mới thành công')
         })
     }
-
-    console.log(authors)
   }
 
   const handleOpenModalEdit = (author) => {
@@ -103,6 +108,15 @@ const AuthorManager = () => {
         })
     }
     return
+  }
+
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setOrder(order === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(field)
+      setOrder('desc')
+    }
   }
 
   const handleView = (id) => {
@@ -172,10 +186,18 @@ const AuthorManager = () => {
                   <div className="flex items-center space-x-2">
                     <span>Tên tác giả</span>
                     <button
-                      // onClick={() => handleSort('name')}
+                      onClick={() => handleSort('name')}
                       className="p-1 rounded-md hover:bg-gray-200 focus:outline-none"
                     >
-                      <ArrowUpDown />
+                      {sortBy === 'name' ? (
+                        order === 'asc' ? (
+                          <ArrowUp />
+                        ) : (
+                          <ArrowDown />
+                        )
+                      ) : (
+                        <ArrowUpDown />
+                      )}
                     </button>
                   </div>
                 </th>
@@ -185,8 +207,19 @@ const AuthorManager = () => {
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center space-x-2">
                     <span>Ngày sinh</span>
-                    <button className="p-1 rounded-md hover:bg-gray-200 focus:outline-none">
-                      <ArrowUpDown />
+                    <button
+                      onClick={() => handleSort('dateOfBirth')}
+                      className="p-1 rounded-md hover:bg-gray-200 focus:outline-none"
+                    >
+                      {sortBy === 'dateOfBirth' ? (
+                        order === 'asc' ? (
+                          <ArrowUp />
+                        ) : (
+                          <ArrowDown />
+                        )
+                      ) : (
+                        <ArrowUpDown />
+                      )}
                     </button>
                   </div>
                 </th>
@@ -275,47 +308,7 @@ const AuthorManager = () => {
       </div>
 
       {/* Pagination */}
-      <div className="mt-6 flex justify-center items-center space-x-2">
-        {/* Previous */}
-        <button
-          onClick={() => page > 1 && navigate(`/admin/authors?page=${page - 1}`)}
-          disabled={page === 1}
-          className={`px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-100 focus:outline-none ${
-            page === 1 ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-        >
-          Trước
-        </button>
-
-        {/* Page numbers */}
-        {[...Array(totalPages)].map((_, index) => {
-          const pageNum = index + 1
-          return (
-            <button
-              key={pageNum}
-              onClick={() => navigate(`/admin/authors?page=${pageNum}`)}
-              className={`px-3 py-1 rounded-md border ${
-                pageNum === page
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-300 hover:bg-gray-100'
-              } focus:outline-none`}
-            >
-              {pageNum}
-            </button>
-          )
-        })}
-
-        {/* Next */}
-        <button
-          onClick={() => page < totalPages && navigate(`/admin/authors?page=${page + 1}`)}
-          disabled={page === totalPages}
-          className={`px-3 py-1 rounded-md border border-gray-300 hover:bg-gray-100 focus:outline-none ${
-            page === totalPages ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-        >
-          Tiếp
-        </button>
-      </div>
+      <Pagination page={page} href={'admin/authors'} totalPages={totalPages} />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Search,
   Edit,
@@ -16,69 +16,98 @@ import {
   Phone,
 } from 'lucide-react'
 
+import { debouncedSearch } from '../../customHook/debounceSearch'
+
+import { useNavigate, useSearchParams } from 'react-router'
+import { toast } from 'react-toastify'
+import {
+  createPublisherAPI,
+  deletePublisherAPI,
+  fetchAllPublishersAPI,
+  updatePublisherAPI,
+} from '../../apis/admin'
+import Pagination from '../../components/Pagination'
+import AddOrUpdatePublisherModal from './AddOrUpdatePublisherModal'
+
 const PublisherManager = () => {
-  const [publishers, setPublishers] = useState([
-    {
-      id: 1,
-      name: 'NXB Giáo dục Việt Nam',
-      address: '81 Trần Hưng Đạo, Hoàn Kiếm, Hà Nội',
-      email: 'info@nxbgd.vn',
-      phone: '024-3822-5555',
-      website: 'https://nxbgd.vn',
-    },
-    {
-      id: 2,
-      name: 'NXB Trẻ',
-      address: '161B Lý Chính Thắng, Phường 7, Quận 3, TP.HCM',
-      email: 'nxbtre@nxbtre.com.vn',
-      phone: '028-3930-5859',
-      website: 'https://nxbtre.com.vn',
-    },
-    {
-      id: 3,
-      name: 'NXB Công nghệ',
-      address: '25 Lý Thường Kiệt, Hoàn Kiếm, Hà Nội',
-      email: 'contact@nxbcongnghe.vn',
-      phone: '024-3756-8888',
-      website: 'https://nxbcongnghe.vn',
-    },
-    {
-      id: 4,
-      name: "O'Reilly Media",
-      address: '1005 Gravenstein Highway North, Sebastopol, CA 95472, USA',
-      email: 'info@oreilly.com',
-      phone: '+1-800-998-9938',
-      website: 'https://oreilly.com',
-    },
-    {
-      id: 5,
-      name: 'NXB Tổng hợp TP.HCM',
-      address: '62 Nguyễn Thị Minh Khai, Phường Đa Kao, Quận 1, TP.HCM',
-      email: 'nxbtonghop@hcm.vnn.vn',
-      phone: '028-3822-6062',
-      website: 'https://nxbtonghop.com.vn',
-    },
-    {
-      id: 6,
-      name: 'Penguin Random House',
-      address: '1745 Broadway, New York, NY 10019, USA',
-      email: 'info@penguinrandomhouse.com',
-      phone: '+1-212-782-9000',
-      website: 'https://penguinrandomhouse.com',
-    },
-  ])
+  const navigate = useNavigate()
 
-  const [searchTerm, setSearchTerm] = useState('')
-  const [sortOrder, setSortOrder] = useState(null)
-  const [sortField, setSortField] = useState('name')
+  let [searchParams] = useSearchParams()
+  const page = Number(searchParams.get('page')) || 1
 
-  const handleEdit = (id) => {
-    console.log('Edit publisher:', id)
-    // Implement edit functionality
+  const [publishers, setPublishers] = useState([])
+  const [totalPublishers, setTotalPublishers] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+
+  const [showModal, setShowModal] = useState(false)
+  const [editingPublisher, setEditingPublisher] = useState(null)
+
+  const [searchPublisher, setSearchPublisher] = useState('')
+  const debouncedPublisherSearch = debouncedSearch(searchPublisher, 500)
+
+  const sortBy = 'name'
+  const [order, setOrder] = useState('')
+
+  useEffect(() => {
+    navigate(
+      `/admin/publishers?page=1&search=${debouncedPublisherSearch}&sortBy=${sortBy}&order=${order}`,
+    )
+  }, [navigate, debouncedPublisherSearch, sortBy, order])
+
+  useEffect(() => {
+    fetchAllPublishersAPI(page, debouncedPublisherSearch, sortBy, order).then((res) => {
+      setPublishers(res.publishers)
+      setTotalPublishers(res.totalDocuments)
+      setTotalPages(res.totalPages)
+    })
+  }, [page, debouncedPublisherSearch, sortBy, order])
+
+  const handleCreateOrUpdatePublisher = (name, address, email, phone, website, idEdit = null) => {
+    if (idEdit) {
+      toast
+        .promise(updatePublisherAPI({ name, address, email, phone, website }, idEdit), {
+          pending: 'Updating publisher...',
+        })
+        .then((res) => {
+          setPublishers((prev) =>
+            prev.map((publisher) => {
+              if (publisher._id == idEdit) publisher = res
+              return publisher
+            }),
+          )
+
+          toast.success('Cập nhật thành công')
+        })
+    } else {
+      toast
+        .promise(createPublisherAPI({ name, address, email, phone, website }), {
+          pending: 'Creating publisher...',
+        })
+        .then((res) => {
+          setPublishers((prev) => [res, ...prev])
+
+          toast.success('Thêm mới thành công')
+        })
+    }
+  }
+
+  const handleOpenEditModal = (publisher) => {
+    setEditingPublisher(publisher)
+    setShowModal(true)
   }
 
   const handleDelete = (id) => {
-    setPublishers(publishers.filter((publisher) => publisher.id !== id))
+    if (confirm('Sếp chắc chứ?')) {
+      toast
+        .promise(deletePublisherAPI(id), {
+          pending: 'Deleting publisher',
+        })
+        .then(() => {
+          setPublishers(publishers.filter((publisher) => publisher._id !== id))
+          toast.success('Xóa thành công')
+        })
+    }
+    return
   }
 
   const handleView = (id) => {
@@ -86,63 +115,32 @@ const PublisherManager = () => {
     // Implement view details functionality
   }
 
-  const handleAddPublisher = () => {
-    console.log('Add new publisher')
-    // Implement add publisher functionality
+  const handleSort = () => {
+    setOrder(order === '' ? 'desc' : order === 'desc' ? 'asc' : 'desc')
   }
-
-  const filteredAndSortedPublishers = publishers
-    .filter(
-      (publisher) =>
-        publisher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        publisher.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        publisher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        publisher.phone.includes(searchTerm) ||
-        publisher.website.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-    .sort((a, b) => {
-      if (!sortOrder) return 0
-
-      const valueA = a[sortField].toLowerCase()
-      const valueB = b[sortField].toLowerCase()
-
-      return sortOrder === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA)
-    })
-
-  const handleSort = (field) => {
-    if (sortField === field) {
-      if (sortOrder === null || sortOrder === 'desc') {
-        setSortOrder('asc')
-      } else {
-        setSortOrder('desc')
-      }
-    } else {
-      setSortField(field)
-      setSortOrder('asc')
-    }
-  }
-
-  const getSortIcon = (field) => {
-    if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />
-    if (sortOrder === 'asc') return <ArrowUp className="h-4 w-4" />
-    if (sortOrder === 'desc') return <ArrowDown className="h-4 w-4" />
-    return <ArrowUpDown className="h-4 w-4" />
-  }
-
-  const totalPublishers = publishers.length
 
   return (
     <div className="publisher-manager mx-auto p-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Quản lý nhà xuất bản</h1>
         <button
-          onClick={handleAddPublisher}
+          onClick={() => setShowModal(true)}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
         >
           <Plus className="h-4 w-4 mr-2" />
           Thêm nhà xuất bản
         </button>
       </div>
+      {showModal && (
+        <AddOrUpdatePublisherModal
+          onClose={() => {
+            setShowModal(false)
+            if (editingPublisher) setEditingPublisher(null)
+          }}
+          onSubmit={handleCreateOrUpdatePublisher}
+          publisherEdit={editingPublisher}
+        />
+      )}
 
       {/* Statistics Card */}
       <div className="mb-6">
@@ -164,8 +162,8 @@ const PublisherManager = () => {
           <input
             type="text"
             placeholder="Tìm kiếm theo tên, địa chỉ, email, SĐT hoặc website..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchPublisher}
+            onChange={(e) => setSearchPublisher(e.target.value)}
             className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -177,16 +175,24 @@ const PublisherManager = () => {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
+                  STT
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div className="flex items-center space-x-2">
                     <span>Tên nhà xuất bản</span>
                     <button
-                      onClick={() => handleSort('name')}
+                      onClick={() => handleSort()}
                       className="p-1 rounded-md hover:bg-gray-200 focus:outline-none"
                     >
-                      {getSortIcon('name')}
+                      {order !== '' ? (
+                        order === 'asc' ? (
+                          <ArrowUp />
+                        ) : (
+                          <ArrowDown />
+                        )
+                      ) : (
+                        <ArrowUpDown />
+                      )}
                     </button>
                   </div>
                 </th>
@@ -205,10 +211,10 @@ const PublisherManager = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAndSortedPublishers.map((publisher) => (
-                <tr key={publisher.id} className="hover:bg-gray-50 transition-colors duration-200">
+              {publishers.map((publisher, index) => (
+                <tr key={publisher._id} className="hover:bg-gray-50 transition-colors duration-200">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">#{publisher.id}</div>
+                    <div className="text-sm font-medium text-gray-900">#{index + 1}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -264,21 +270,21 @@ const PublisherManager = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => handleView(publisher.id)}
+                        onClick={() => handleView(publisher._id)}
                         className="p-1.5 border border-gray-300 rounded-md text-green-600 hover:text-green-800 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500"
                         title="Xem chi tiết"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleEdit(publisher.id)}
+                        onClick={() => handleOpenEditModal(publisher)}
                         className="p-1.5 border border-gray-300 rounded-md text-blue-600 hover:text-blue-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         title="Chỉnh sửa"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(publisher.id)}
+                        onClick={() => handleDelete(publisher._id)}
                         className="p-1.5 border border-gray-300 rounded-md text-red-600 hover:text-red-800 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
                         title="Xóa"
                       >
@@ -292,11 +298,11 @@ const PublisherManager = () => {
           </table>
         </div>
 
-        {filteredAndSortedPublishers.length === 0 && (
+        {publishers.length === 0 && (
           <div className="text-center py-12">
             <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">
-              {searchTerm
+              {searchPublisher
                 ? 'Không tìm thấy nhà xuất bản phù hợp'
                 : 'Chưa có nhà xuất bản nào trong hệ thống'}
             </p>
@@ -305,8 +311,11 @@ const PublisherManager = () => {
       </div>
 
       <div className="mt-6 text-center text-sm text-gray-600">
-        Hiển thị: {filteredAndSortedPublishers.length} / {publishers.length} nhà xuất bản
+        Hiển thị: {publishers.length} / {publishers.length} nhà xuất bản
       </div>
+
+      {/* Pagination */}
+      <Pagination page={page} href={'admin/publishers'} totalPages={totalPages} />
     </div>
   )
 }

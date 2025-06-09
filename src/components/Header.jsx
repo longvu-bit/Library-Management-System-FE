@@ -12,6 +12,7 @@ import {
 import { Link, useNavigate } from 'react-router'
 
 import { logoutAPI } from '../apis/auth'
+import { toast } from 'react-toastify'
 
 const Header = () => {
   const user = JSON.parse(localStorage.getItem('user'))
@@ -24,6 +25,7 @@ const Header = () => {
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('accessToken')
     navigate('/login')
+    toast.success('Đăng xuất thành công')
   }
 
   return (
