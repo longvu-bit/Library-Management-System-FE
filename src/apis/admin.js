@@ -1,8 +1,56 @@
 import axiosInstance from '../utils/axiosInterceptor'
 
 //User APIs
+export const fetchAllUsersAPI = async (page, search, sortBy, order) => {
+  const params = new URLSearchParams({
+    page,
+    search,
+    sortBy,
+    order,
+  })
+  const response = await axiosInstance.get(`/users?${params.toString()}`)
+  return response.data
+}
+
+export const createUserAPI = async (newUser) => {
+  const response = await axiosInstance.post(`/users`, newUser)
+  return response.data
+}
+
+export const updateUserAPI = async (updateData, id) => {
+  const response = await axiosInstance.put(`/users/${id}`, updateData)
+  return response.data
+}
+
+export const deleteUserAPI = async (id) => {
+  return await axiosInstance.delete(`/users/${id}`)
+}
 
 //Book APIs
+export const fetchAllBooksAPI = async (page, search, sortBy, order) => {
+  const params = new URLSearchParams({
+    page,
+    search,
+    sortBy,
+    order,
+  })
+  const response = await axiosInstance.get(`/books?${params.toString()}`)
+  return response.data
+}
+
+export const createBookAPI = async (newBook) => {
+  const response = await axiosInstance.post(`/books`, newBook)
+  return response.data
+}
+
+export const updateBookAPI = async (updateData, id) => {
+  const response = await axiosInstance.put(`/books/${id}`, updateData)
+  return response.data
+}
+
+export const deleteBookAPI = async (id) => {
+  return await axiosInstance.delete(`/books/${id}`)
+}
 
 //Borrow APIs
 
@@ -15,6 +63,11 @@ export const fetchAllAuthorsAPI = async (page, search, sortBy, order) => {
     order,
   })
   const response = await axiosInstance.get(`/authors?${params.toString()}`)
+  return response.data
+}
+
+export const fetchAllAUthorNoPaginationAPI = async () => {
+  const response = await axiosInstance.get(`/authors/all`)
   return response.data
 }
 
@@ -42,6 +95,11 @@ export const fetchAllPublishersAPI = async (page, search, sortBy, order) => {
     order,
   })
   const response = await axiosInstance.get(`/publishers?${params.toString()}`)
+  return response.data
+}
+
+export const fetchAllPublisherNoPaginationAPI = async () => {
+  const response = await axiosInstance.get(`/publishers/all`)
   return response.data
 }
 
