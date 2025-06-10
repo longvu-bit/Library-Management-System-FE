@@ -18,6 +18,7 @@ import AuthorManager from './adminPages/authors/AuthorManager'
 import CategoryManager from './adminPages/categories/CategoryManager'
 import UserProfile from './pages/UserProfile'
 import AccessDenied from './pages/AccessDenied'
+import BookCart from './pages/BookCart'
 
 function App() {
   return (
@@ -25,10 +26,12 @@ function App() {
       <Routes>
         <Route path="/" element={<ClientLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/books" element={<HomePage />} />
           <Route path="/books/details/:id" element={<DetailBook />} />
           <Route path="/books/borrow/:id" element={<BorrowBook />} />
           <Route path="/books/history" element={<HistoryBorrowBook />} />
           <Route path="/user/profile" element={<UserProfile />} />
+          <Route path="/user/carts" element={<BookCart />} />
         </Route>
 
         <Route path="/login" element={<Login />} />

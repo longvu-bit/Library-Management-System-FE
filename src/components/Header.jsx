@@ -1,7 +1,9 @@
 import logo from '~/assets/logo.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
+  faCartShopping,
   faClock,
+  faDashboard,
   faHistory,
   faLocationDot,
   faMagnifyingGlass,
@@ -64,6 +66,15 @@ const Header = () => {
                 </Link>
                 {/* Dropdown xuất hiện khi hover */}
                 <ul className="absolute left-0  mt-2 hidden group-hover:block bg-white rounded shadow-lg z-10 min-w-[200px]">
+                  {/* admin */}
+                  <li>
+                    <Link to="/admin" className="block px-4 py-2  text-gray-700 hover:bg-blue-100">
+                      <FontAwesomeIcon icon={faDashboard} />
+                      Admin dashboard
+                    </Link>
+                  </li>
+
+                  {/* client */}
                   <li>
                     <Link
                       to="/user/profile"
@@ -74,12 +85,21 @@ const Header = () => {
                   </li>
                   <li>
                     <Link
+                      to="/user/carts"
+                      className="block px-4 py-2  text-gray-700 hover:bg-blue-100"
+                    >
+                      <FontAwesomeIcon icon={faCartShopping} /> Cart
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
                       to="/books/history"
                       className="block px-4 py-2  text-gray-700 hover:bg-blue-100"
                     >
                       <FontAwesomeIcon icon={faHistory} /> History
                     </Link>
                   </li>
+
                   <li>
                     <p
                       className="block px-4 py-2 text-gray-700 hover:bg-blue-100"
