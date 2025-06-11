@@ -22,7 +22,10 @@ const ButtonBorrow = ({ currentBook }) => {
 
   const handleBorrowBook = (id) => {
     const isAddCart = handleAddToCart(id)
-    if (isAddCart) return navigate('/user/carts')
+    if (isAddCart)
+      setTimeout(() => {
+        navigate('/user/carts')
+      }, 300)
   }
 
   return (
