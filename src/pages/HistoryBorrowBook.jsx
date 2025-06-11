@@ -14,164 +14,43 @@ import {
   RotateCcw,
   User,
   Package,
+  Send,
+  X,
 } from 'lucide-react'
-
-// Sample data based on BorrowRecord model
-const sampleBorrowRecords = [
-  {
-    _id: '64a1b2c3d4e5f6789012345a',
-    userId: {
-      _id: 'user123',
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@email.com',
-    },
-    bookId: {
-      _id: '665e40a2f3e1a0c3e0d1a302',
-      title: 'Dế Mèn Phiêu Lưu Ký',
-      author: {
-        name: 'Tô Hoài',
-      },
-      image: ['https://picsum.photos/200?random=2'],
-      category: {
-        name: 'Thiếu nhi',
-      },
-    },
-    borrowDate: '2024-01-15T08:00:00.000Z',
-    dueDate: '2024-02-14T23:59:59.000Z',
-    returnDate: '2024-02-10T14:30:00.000Z',
-    status: 'returned',
-    createdAt: '2024-01-15T08:00:00.000Z',
-    updatedAt: '2024-02-10T14:30:00.000Z',
-  },
-  {
-    _id: '64a1b2c3d4e5f6789012345b',
-    userId: {
-      _id: 'user123',
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@email.com',
-    },
-    bookId: {
-      _id: '665e40a2f3e1a0c3e0d1a301',
-      title: 'Clean Code edit',
-      author: {
-        name: 'quyen bv',
-      },
-      image: ['https://picsum.photos/200?random=1'],
-      category: {
-        name: 'Chưa phân loại',
-      },
-    },
-    borrowDate: '2024-02-01T09:15:00.000Z',
-    dueDate: '2024-03-02T23:59:59.000Z',
-    returnDate: null,
-    status: 'borrowed',
-    createdAt: '2024-02-01T09:15:00.000Z',
-    updatedAt: '2024-02-01T09:15:00.000Z',
-  },
-  {
-    _id: '64a1b2c3d4e5f6789012345c',
-    userId: {
-      _id: 'user123',
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@email.com',
-    },
-    bookId: {
-      _id: '6846e8a48efd7f63d18e7d88',
-      title: 'quyen hero',
-      author: {
-        name: 'quyen bv',
-      },
-      image: ['https://picsum.photos/200?random=3'],
-      category: {
-        name: 'Chưa phân loại',
-      },
-    },
-    borrowDate: '2023-12-10T10:30:00.000Z',
-    dueDate: '2024-01-09T23:59:59.000Z',
-    returnDate: null,
-    status: 'overdue',
-    createdAt: '2023-12-10T10:30:00.000Z',
-    updatedAt: '2023-12-10T10:30:00.000Z',
-  },
-  {
-    _id: '64a1b2c3d4e5f6789012345d',
-    userId: {
-      _id: 'user123',
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@email.com',
-    },
-    bookId: {
-      _id: '6846e976a05a8ff530d0bf35',
-      title: 'new book',
-      author: {
-        name: 'quyen bv',
-      },
-      image: ['https://picsum.photos/200?random=4'],
-      category: {
-        name: 'Thiếu nhi',
-      },
-    },
-    borrowDate: '2023-11-20T14:45:00.000Z',
-    dueDate: '2023-12-20T23:59:59.000Z',
-    returnDate: '2023-12-18T16:20:00.000Z',
-    status: 'returned',
-    createdAt: '2023-11-20T14:45:00.000Z',
-    updatedAt: '2023-12-18T16:20:00.000Z',
-  },
-  {
-    _id: '64a1b2c3d4e5f6789012345e',
-    userId: {
-      _id: 'user123',
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@email.com',
-    },
-    bookId: {
-      _id: '6846ecb6a05a8ff530d0bfb6',
-      title: 'Tôi tài giỏi, bạn thì chicken',
-      author: {
-        name: 'quyen bv',
-      },
-      image: ['https://picsum.photos/200?random=5'],
-      category: {
-        name: 'Chưa phân loại',
-      },
-    },
-    borrowDate: '2023-10-15T11:00:00.000Z',
-    dueDate: '2023-11-14T23:59:59.000Z',
-    returnDate: '2023-11-12T13:15:00.000Z',
-    status: 'returned',
-    createdAt: '2023-10-15T11:00:00.000Z',
-    updatedAt: '2023-11-12T13:15:00.000Z',
-  },
-]
+import { fetchBorrowRecordsByUserClientAPI } from '../apis/client'
+import { useForm } from 'react-hook-form'
 
 const HistoryBorrowBook = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
+
   const [borrowedBooks, setBorrowedBooks] = useState([])
   const [filteredBooks, setFilteredBooks] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [isLoading, setIsLoading] = useState(true)
+  const [itemSelectShowForm, setItemSelectShowForm] = useState(null)
+
+  const [showUpdateDueDateForm, setShowUpdateDueDateForm] = useState(false)
 
   useEffect(() => {
-    // Simulate API call
-    const fetchBorrowHistory = async () => {
-      setIsLoading(true)
-      // Simulate loading delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setBorrowedBooks(sampleBorrowRecords)
-      setFilteredBooks(sampleBorrowRecords)
-      setIsLoading(false)
-    }
-
-    fetchBorrowHistory()
+    setIsLoading(true)
+    fetchBorrowRecordsByUserClientAPI().then((res) => {
+      setBorrowedBooks(res.userBorrowReq)
+      setFilteredBooks(res.userBorrowReq)
+    })
+    setIsLoading(false)
   }, [])
 
   useEffect(() => {
     // Filter books based on search term and status
     const filtered = borrowedBooks.filter((record) => {
       const matchesSearch =
-        record.bookId.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        record.bookId.author.name.toLowerCase().includes(searchTerm.toLowerCase())
+        record.book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        record.book.author.name.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = statusFilter === 'all' || record.status === statusFilter
       return matchesSearch && matchesStatus
     })
@@ -245,14 +124,13 @@ const HistoryBorrowBook = () => {
     return null
   }
 
-  const handleViewBook = (bookId) => {
-    console.log(`Viewing book details: ${bookId}`)
+  const handleViewBook = (book) => {
+    console.log(`Viewing book details: ${book}`)
     // Navigate to book details page
   }
 
-  const handleRenewBook = (recordId) => {
-    console.log(`Renewing book: ${recordId}`)
-    // Handle book renewal
+  const handleUpdateDueDate = (data) => {
+    console.log(data)
   }
 
   if (isLoading) {
@@ -372,8 +250,8 @@ const HistoryBorrowBook = () => {
                   {/* Book Image */}
                   <div className="flex-shrink-0">
                     <img
-                      src={record.bookId.image[0] || '/placeholder.svg?height=150&width=100'}
-                      alt={record.bookId.title}
+                      src={record.book.image[0] || '/placeholder.svg?height=150&width=100'}
+                      alt={record.book.title}
                       className="w-24 h-32 object-cover rounded-lg shadow-md"
                     />
                   </div>
@@ -383,17 +261,17 @@ const HistoryBorrowBook = () => {
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          {record.bookId.title}
+                          {record.book.title}
                         </h3>
 
                         <div className="flex items-center gap-4 text-gray-600 mb-3">
                           <div className="flex items-center gap-1">
                             <User className="h-4 w-4" />
-                            <span className="text-sm">{record.bookId.author.name}</span>
+                            <span className="text-sm">{record.book.author.name}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Package className="h-4 w-4" />
-                            <span className="text-sm">{record.bookId.category.name}</span>
+                            <span className="text-sm">{record.book.category.name}</span>
                           </div>
                         </div>
 
@@ -445,24 +323,95 @@ const HistoryBorrowBook = () => {
                           </div>
                         )}
 
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleViewBook(record.bookId._id)}
-                            className="flex items-center gap-1 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
-                          >
-                            <Eye className="h-4 w-4" />
-                            Xem chi tiết
-                          </button>
-
-                          {record.status === 'borrowed' && (
+                        <div>
+                          <div className="flex gap-2">
                             <button
-                              onClick={() => handleRenewBook(record._id)}
-                              className="flex items-center gap-1 px-3 py-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors text-sm"
+                              onClick={() => handleViewBook(record.book._id)}
+                              className="flex items-center gap-1 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm"
                             >
-                              <RotateCcw className="h-4 w-4" />
-                              Gia hạn
+                              <Eye className="h-4 w-4" />
+                              Xem chi tiết
                             </button>
-                          )}
+
+                            {record.status === 'borrowed' && (
+                              <button
+                                onClick={() => {
+                                  setShowUpdateDueDateForm(true)
+                                  setItemSelectShowForm(record._id)
+                                }}
+                                className="flex items-center gap-1 px-3 py-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors text-sm"
+                              >
+                                <RotateCcw className="h-4 w-4" />
+                                Gia hạn
+                              </button>
+                            )}
+                          </div>
+                          <form
+                            className={`space-y-4 mt-2 shadow-2xl p-4 ${
+                              showUpdateDueDateForm && itemSelectShowForm == record._id
+                                ? 'block'
+                                : 'hidden'
+                            }`}
+                            onSubmit={handleSubmit(handleUpdateDueDate)}
+                          >
+                            <div className="flex items-center justify-between mb-4">
+                              <h3 className="text-lg font-semibold text-gray-900">
+                                Gia hạn ngày trả
+                              </h3>
+                              <button
+                                onClick={() => {
+                                  setShowUpdateDueDateForm(false)
+                                  setItemSelectShowForm(null)
+                                }}
+                                className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                              >
+                                <X className="h-5 w-5" />
+                              </button>
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <Calendar className="h-4 w-4 inline mr-1" />
+                                Ngày trả sách <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                {...register('newDueDate', {
+                                  required: 'Vui long chon ngay tra sach',
+                                  validate: (value) => {
+                                    const today = new Date()
+                                    const newDueDate = new Date(value)
+                                    const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000
+
+                                    if (
+                                      newDueDate <= today ||
+                                      newDueDate - today > THIRTY_DAYS_IN_MS
+                                    )
+                                      return 'Vui long chon ngay trong tuong lai 30 ngay toi'
+                                    return true
+                                  },
+                                })}
+                                type="date"
+                                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 'border-gray-300'`}
+                              />
+                              {errors.newDueDate && (
+                                <p className="text-red-700">{errors.newDueDate.message}</p>
+                              )}
+
+                              <p className="text-xs text-gray-500 mt-1">
+                                Thời gian mượn tối đa: 30 ngày
+                              </p>
+                            </div>
+
+                            {/* Submit Button */}
+                            <button
+                              type="submit"
+                              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                              <>
+                                <Send className="h-5 w-5" />
+                                Xác nhận gia hạn
+                              </>
+                            </button>
+                          </form>
                         </div>
                       </div>
                     </div>

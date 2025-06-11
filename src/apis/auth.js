@@ -15,7 +15,11 @@ export const loginAPI = async (data) => {
 export const logoutAPI = async () => {
   const response = await axiosInstance.post('/auth/logout')
 
-  return response.data
+  localStorage.removeItem('user')
+  localStorage.removeItem('refreshToken')
+  localStorage.removeItem('accessToken')
+
+  return response
 }
 
 export const refreshTokenAPI = async () => {

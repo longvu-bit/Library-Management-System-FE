@@ -18,21 +18,37 @@ import {
   Edit3,
 } from 'lucide-react'
 
-import { fetchAllCartByUserClientAPI } from '../apis/client'
+import {
+  createBorrowBooksClientAPI,
+  deleteCartItemClientAPI,
+  fetchAllCartByUserClientAPI,
+  updateQuantityCartItemClientAPI,
+} from '../apis/client'
+import { useForm } from 'react-hook-form'
+import { formatDate } from '../utils/formatters'
+import { toast } from 'react-toastify'
 
 const BookCart = () => {
   const userInfo = JSON.parse(localStorage.getItem('user'))
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
 
   const [cartItems, setCartItems] = useState([])
   const [selectedItems, setSelectedItems] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showBorrowForm, setShowBorrowForm] = useState(false)
+  const [availableItems, setAvailableItems] = useState([])
 
   useEffect(() => {
     const fetchCartItems = async () => {
       setIsLoading(true)
       await fetchAllCartByUserClientAPI(userInfo._id).then((res) => {
         setCartItems(res)
+        setAvailableItems(res.filter((item) => item.book.available >= item.quantity))
       })
       setIsLoading(false)
     }
@@ -40,7 +56,6 @@ const BookCart = () => {
     fetchCartItems()
   }, [userInfo._id])
 
-  const availableItems = cartItems.filter((item) => item.book.available >= item.quantity)
   const unavailableItems = cartItems.filter((item) => item.book.available < item.quantity)
 
   const toggleSelectItem = (item) => {
@@ -63,8 +78,53 @@ const BookCart = () => {
     setSelectedItems([])
   }
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN')
+  const handleBorrowBooks = async (data) => {
+    const booksBorrow = []
+    const booksId = []
+
+    selectedItems.forEach((book) => {
+      const addBook = { book: book.book._id, quantity: book.quantity, dueDate: data.dueDate }
+      booksBorrow.push(addBook)
+
+      booksId.push(book.book._id)
+    })
+
+    toast
+      .promise(createBorrowBooksClientAPI({ booksBorrow }), {
+        pending: 'Borrowing ...',
+      })
+      .then(() => {
+        setAvailableItems((prev) => prev.filter((item) => !booksId.includes(item.book._id)))
+        toast.success('Đăng ký mượn sách thành công')
+      })
+  }
+  console.log(availableItems)
+
+  const handleUpdateQuantity = async (cartId, type) => {
+    toast
+      .promise(updateQuantityCartItemClientAPI(cartId, type), {
+        pending: 'Updating quantity...',
+      })
+      .then((res) => {
+        setAvailableItems((prev) =>
+          prev.map((item) => {
+            if (item._id === res._id) return (item = res)
+            return item
+          }),
+        )
+        toast.success('Cập nhật số lượng thành công')
+      })
+  }
+
+  const handleDeleteItemInCarts = (cartId) => {
+    toast
+      .promise(deleteCartItemClientAPI(cartId), {
+        pending: 'Deleting cart item...',
+      })
+      .then(() => {
+        setAvailableItems((prev) => prev.filter((item) => item._id != cartId))
+        toast.success('Xóa thành công')
+      })
   }
 
   if (isLoading && cartItems.length === 0) {
@@ -205,22 +265,28 @@ const BookCart = () => {
                           {/* Return Date */}
                           <div className="flex items-center gap-2 mb-3">
                             <Clock className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm text-gray-600">Dự kiến trả:</span>
-                            <input
+                            <span className="text-sm text-gray-600">
+                              Dự kiến trả: {formatDate(item.requestedReturnDate)}
+                            </span>
+                            {/* <input
                               type="date"
                               value={item.requestedReturnDate?.split('T')[0] || ''}
                               className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                            /> */}
                           </div>
                         </div>
                         {/* Quantity Controls */}
                         <div className="flex flex-col items-end gap-3">
-                          <button className="text-red-600 hover:text-red-700 p-1">
+                          <button
+                            onClick={() => handleDeleteItemInCarts(item._id)}
+                            className="text-red-600 hover:text-red-700 p-1"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </button>
 
                           <div className="flex items-center gap-2 bg-gray-100 rounded-lg">
                             <button
+                              onClick={() => handleUpdateQuantity(item._id, 'decrease')}
                               disabled={item.quantity == 1}
                               className="p-2 hover:bg-gray-200 rounded-l-lg transition-colors"
                             >
@@ -230,6 +296,7 @@ const BookCart = () => {
                               {item.quantity}
                             </span>
                             <button
+                              onClick={() => handleUpdateQuantity(item._id, 'increase')}
                               disabled={item.quantity == 3}
                               className="p-2 hover:bg-gray-200 rounded-r-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -237,7 +304,9 @@ const BookCart = () => {
                             </button>
                           </div>
 
-                          <span className="text-xs text-gray-500">Tối đa: 3</span>
+                          <span className="text-xs text-gray-500">
+                            Tối đa: {item.book.available >= 3 ? '3' : item.book.available}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -315,7 +384,7 @@ const BookCart = () => {
 
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Tổng số sách đã chọn:</span>
+                    <span className="text-gray-600">Tổng số đầu sách đã chọn:</span>
                     <span className="font-medium">{selectedItems.length} cuốn</span>
                   </div>
                   <div className="flex justify-between">
@@ -323,7 +392,7 @@ const BookCart = () => {
                     <span className="font-medium text-green-600">{selectedItems.length} cuốn</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Tổng số sách trong giỏ:</span>
+                    <span className="text-gray-600">Tổng số lượng sách trong giỏ:</span>
                     <span className="font-medium text-gray-600">
                       {availableItems.reduce((total, item) => total + item.quantity, 0)} cuốn
                     </span>
@@ -367,7 +436,7 @@ const BookCart = () => {
                   </button>
                 </div>
 
-                <div className="space-y-4">
+                <form className="space-y-4" onSubmit={handleSubmit(handleBorrowBooks)}>
                   {/* Return Date */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -375,29 +444,30 @@ const BookCart = () => {
                       Ngày trả sách <span className="text-red-500">*</span>
                     </label>
                     <input
+                      {...register('dueDate', {
+                        required: 'Vui long chon ngay tra sach',
+                        validate: (value) => {
+                          const now = new Date()
+                          const dueDate = new Date(value)
+                          const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000
+
+                          if (dueDate <= now || dueDate - now > THIRTY_DAYS_IN_MS)
+                            return 'Vui long chon ngay trong tuong lai 30 ngay toi'
+                          return true
+                        },
+                      })}
                       type="date"
                       className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 'border-gray-300'
                         `}
                     />
+                    {errors.dueDate && <p className="text-red-700">{errors.dueDate.message}</p>}
 
                     <p className="text-xs text-gray-500 mt-1">Thời gian mượn tối đa: 30 ngày</p>
                   </div>
 
-                  {/* Notes */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <Edit3 className="h-4 w-4 inline mr-1" />
-                      Ghi chú (tùy chọn)
-                    </label>
-                    <textarea
-                      placeholder="Thêm ghi chú cho thủ thư..."
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
                   {/* Submit Button */}
                   <button
+                    type="submit"
                     disabled={isLoading || availableItems.length === 0}
                     className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
@@ -409,11 +479,11 @@ const BookCart = () => {
                     ) : (
                       <>
                         <Send className="h-5 w-5" />
-                        Xác nhận mượn {availableItems.length} sách
+                        Xác nhận mượn {selectedItems.length} sách
                       </>
                     )}
                   </button>
-                </div>
+                </form>
               </div>
 
               {/* Help Text */}

@@ -23,9 +23,7 @@ const Header = () => {
 
   const handleLogout = () => {
     logoutAPI()
-    localStorage.removeItem('user')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('accessToken')
+
     navigate('/login')
     toast.success('Đăng xuất thành công')
   }
@@ -65,7 +63,7 @@ const Header = () => {
                   <FontAwesomeIcon icon={faUser} /> {user?.name}
                 </Link>
                 {/* Dropdown xuất hiện khi hover */}
-                <ul className="absolute left-0  mt-2 hidden group-hover:block bg-white rounded shadow-lg z-10 min-w-[200px]">
+                <ul className="absolute left-0  mt-1 hidden group-hover:block bg-white rounded shadow-lg z-10 min-w-[200px]">
                   {/* admin */}
                   <li>
                     <Link to="/admin" className="block px-4 py-2  text-gray-700 hover:bg-blue-100">
