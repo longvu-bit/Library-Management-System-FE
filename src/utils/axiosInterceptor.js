@@ -45,38 +45,38 @@ axiosInstance.interceptors.response.use(
     interceptorLoadingElements(false)
 
     // UNAUTHORIZED
-    // if (error.response?.status === 401) {
-    //   logoutAPI()
-    // }
+    if (error.response?.status === 401) {
+      logoutAPI()
+    }
 
-    // const originalRequests = error.config
-    // if (error.response?.status === 410 && originalRequests) {
-    //   if (!refreshTokenPromise) {
-    //     refreshTokenPromise = refreshTokenAPI()
-    //       .then((res) => {
-    //         return res?.accessToken
-    //       })
-    //       .catch((_error) => {
-    //         logoutAPI()
-    //         return Promise.reject(_error)
-    //       })
-    //       .finally(() => {
-    //         refreshTokenPromise = null
-    //       })
-    //   }
+    const originalRequests = error.config
+    if (error.response?.status === 410 && originalRequests) {
+      if (!refreshTokenPromise) {
+        refreshTokenPromise = refreshTokenAPI()
+          .then((res) => {
+            return res?.accessToken
+          })
+          .catch((_error) => {
+            logoutAPI()
+            return Promise.reject(_error)
+          })
+          .finally(() => {
+            refreshTokenPromise = null
+          })
+      }
 
-    //   return refreshTokenPromise.then((accessToken) => {
-    //     /**
-    //      * B1: Doi voi du an can luu accessToken vao localStorage hoac o dau do thi viet them o day
-    //      * Hien tai ko can vi BE su dung httpOnly
-    //      */
-    //     originalRequests.headers.authorization = `Bearer ${accessToken}`
-    //     localStorage.setItem('accessToken', accessToken)
+      return refreshTokenPromise.then((accessToken) => {
+        /**
+         * B1: Doi voi du an can luu accessToken vao localStorage hoac o dau do thi viet them o day
+         * Hien tai ko can vi BE su dung httpOnly
+         */
+        originalRequests.headers.authorization = `Bearer ${accessToken}`
+        localStorage.setItem('accessToken', accessToken)
 
-    //     // B2: Return lai axios instance ket hop voi originalRequests de goi lai nhung api ban dau bi loi
-    //     return axiosInstance(originalRequests)
-    //   })
-    // }
+        // B2: Return lai axios instance ket hop voi originalRequests de goi lai nhung api ban dau bi loi
+        return axiosInstance(originalRequests)
+      })
+    }
 
     let errorMessage = error?.message
     if (error.response?.data?.message) {
