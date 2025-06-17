@@ -116,16 +116,16 @@ const UserManager = () => {
 
   return (
     <div className="user-manager mx-auto p-6">
-      {/* <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Quản lý người dùng</h1>
         <button
-          onClick={handleAddUser}
+          // onClick={handleAddUser}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          {/* <Plus className="h-4 w-4 mr-2" /> */}
           Thêm người dùng
         </button>
-      </div> */}
+      </div>
 
       {/* Statistics Card */}
       <div className="mb-6">
@@ -141,18 +141,19 @@ const UserManager = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="mb-6">
-        <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên, email hoặc số điện thoại..."
-            value={searchUser}
-            onChange={(e) => setSearchUser(e.target.value)}
-            className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+      
+      <div className="mb-8">
+          <div className="relative max-w-md">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên, email hoặc số điện thoại..."
+              value={searchUser}
+              onChange={(e) => setSearchUser(e.target.value)}
+              className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+            />
+          </div>
         </div>
-      </div>
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
@@ -221,7 +222,7 @@ const UserManager = () => {
               {users.map((user, index) => (
                 <tr key={user._id} className="hover:bg-gray-50 transition-colors duration-200">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">#{index + 1}</div>
+                    <div className="text-sm font-medium text-gray-900">{index + 1}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{user.name}</div>

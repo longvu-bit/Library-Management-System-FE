@@ -103,7 +103,7 @@ const BorrowBookManager = () => {
 
   return (
     <div className="history-manager  mx-auto p-6">
-      <h1 className="text-3xl text-center font-bold mb-8 text-gray-800">
+      <h1 className="text-3xl  font-bold mb-8 text-gray-800">
         Quản lý lịch sử mượn sách
       </h1>
       {/* Statistics Card */}
@@ -120,17 +120,17 @@ const BorrowBookManager = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="mb-6">
-        <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên người dùng hoặc tên sách..."
+      <div className="mb-8">
+          <div className="relative max-w-md">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên người dùng hoặc tên sách..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+              className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+            />
+          </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -138,6 +138,9 @@ const BorrowBookManager = () => {
           <table className="w-full table-auto">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  STT
+                </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tên người dùng
                 </th>
@@ -170,17 +173,21 @@ const BorrowBookManager = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {records.borrowRecords.map((record) => (
+              {console.log(records.borrowRecords)}
+              {records.borrowRecords.map((record,i) => (
                 <tr key={record._id} className="hover:bg-gray-50 transition-colors duration-200">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{record.user.name}</div>
+                    <div className="text-sm font-medium text-gray-900">{i+1}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{record.user?.name ?? record.userSnapshot?.name}</div>
                   </td>
                   <td className="px-6 py-4">
                     <div
                       className="text-sm text-gray-900 max-w-xs truncate"
-                      title={record.book.title}
+                      title={record.book?.title ?? record.bookSnapshot?.title}
                     >
-                      {record.book.title}
+                      {record.book?.title ?? record.bookSnapshot?.title}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{record.quantity}</td>

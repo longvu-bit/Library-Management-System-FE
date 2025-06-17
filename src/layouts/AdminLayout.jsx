@@ -1,11 +1,15 @@
 import { Outlet } from 'react-router'
-import AdminHeader from '../adminPages/HeaderDashBoard'
+import AdminSidebar from '../adminPages/HeaderDashBoard'
 
 const AdminLayout = () => {
   return (
     <>
-      <AdminHeader />
-      <Outlet />
+     <div className="flex h-screen bg-gray-100">
+      <AdminSidebar />
+      <div className="flex">
+        <Outlet />
+      </div>
+    </div>
     </>
   )
 }
