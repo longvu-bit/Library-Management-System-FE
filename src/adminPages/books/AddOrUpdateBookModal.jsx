@@ -2,7 +2,7 @@
 
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { set, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { toDateInputValue } from '../../utils/formatters'
 import {
   fetchAllCategoriesAPI,
@@ -14,6 +14,8 @@ const AddOrUpdateBookModal = ({ onClose, onSubmit, bookEdit }) => {
   const [categories, setCategories] = useState([])
   const [publishers, setPublishers] = useState([])
   const [authors, setAuthors] = useState([])
+
+  console.log(bookEdit)
 
   const {
     register,
@@ -57,44 +59,12 @@ const AddOrUpdateBookModal = ({ onClose, onSubmit, bookEdit }) => {
   }, [bookEdit, isDataReady, reset])
 
   const handleCreateOrUpdateBook = (data) => {
-    const {
-      title,
-      description,
-      image,
-      author,
-      publisher,
-      category,
-      quantity,
-      available,
-      publishedYear,
-    } = data
-
     if (bookEdit) {
       const idEdit = bookEdit._id
-      onSubmit(
-        title,
-        description,
-        image,
-        author,
-        publisher,
-        category,
-        quantity,
-        available,
-        publishedYear,
-        idEdit,
-      )
+      console.log(idEdit)
+      onSubmit(data, idEdit)
     } else {
-      onSubmit(
-        title,
-        description,
-        image,
-        author,
-        publisher,
-        category,
-        quantity,
-        available,
-        publishedYear,
-      )
+      onSubmit(data)
     }
 
     onClose()

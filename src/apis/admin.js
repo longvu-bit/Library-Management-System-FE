@@ -39,6 +39,7 @@ export const fetchAllBooksAPI = async (page, search, sortBy, order) => {
 }
 
 export const createBookAPI = async (newBook) => {
+  console.log(newBook)
   const response = await axiosInstance.post(`/books`, newBook)
   return response.data
 }

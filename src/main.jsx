@@ -6,10 +6,15 @@ import { BrowserRouter } from 'react-router'
 //react-toastify
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <App />
-    <ToastContainer position="bottom-left" />
+    <QueryClientProvider client={queryClient}>
+      <App />
+      <ToastContainer position="bottom-left" />
+    </QueryClientProvider>
   </BrowserRouter>,
 )

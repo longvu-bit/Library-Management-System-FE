@@ -60,7 +60,7 @@ const BookManager = () => {
   const handleDelete = (id) => {
     if (confirm('Sếp chắc chứ?')) {
       toast
-        .promise(deleteBookAPI(), {
+        .promise(deleteBookAPI(id), {
           pending: 'Deleting book...',
         })
         .then(() => {
@@ -75,66 +75,22 @@ const BookManager = () => {
     // Implement view details functionality
   }
 
-  const handleCreateOrUpdateBook = (
-    title,
-    description,
-    image,
-    author,
-    publisher,
-    category,
-    quantity,
-    available,
-    publishedYear,
-    idEdit = null,
-  ) => {
+  const handleCreateOrUpdateBook = (data, idEdit = null) => {
     if (idEdit) {
-      toast
-        .promise(
-          updateBookAPI(
-            {
-              title,
-              description,
-              image,
-              author,
-              publisher,
-              category,
-              quantity,
-              available,
-              publishedYear,
-            },
-            idEdit,
-          ),
-          { pending: 'Updating book...' },
-        )
-        .then((res) => {
-          setBooks((prev) =>
-            prev.map((b) => {
-              if (b._id == idEdit) b = res
-              return b
-            }),
-          )
-          toast.success('Cập nhật thành công')
-        })
-    } else {
-      toast
-        .promise(
-          createBookAPI({
-            title,
-            description,
-            image,
-            author,
-            publisher,
-            category,
-            quantity,
-            available,
-            publishedYear,
+      toast.promise(updateBookAPI(data, idEdit), { pending: 'Updating book...' }).then((res) => {
+        setBooks((prev) =>
+          prev.map((b) => {
+            if (b._id == idEdit) b = res
+            return b
           }),
-          { pending: 'Creating book...' },
         )
-        .then((res) => {
-          setBooks((prev) => [res, ...prev])
-          toast.success('Thêm mới thành công')
-        })
+        toast.success('Cập nhật thành công')
+      })
+    } else {
+      toast.promise(createBookAPI(data), { pending: 'Creating book...' }).then((res) => {
+        setBooks((prev) => [res, ...prev])
+        toast.success('Thêm mới thành công')
+      })
     }
   }
 

@@ -10,6 +10,8 @@ const AccessDenied = () => {
     phone: '1900-1234',
   }
 
+  const user = localStorage.getItem('user')
+
   const [countdown, setCountdown] = useState(10)
 
   const navigate = useNavigate()
@@ -59,13 +61,15 @@ const AccessDenied = () => {
                 Về trang chủ
               </Link>
 
-              <Link
-                to={'/login'}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-              >
-                <LogIn className="h-4 w-4" />
-                Đăng nhập
-              </Link>
+              {!user && (
+                <Link
+                  to={'/login'}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                >
+                  <LogIn className="h-4 w-4" />
+                  Đăng nhập
+                </Link>
+              )}
             </div>
 
             {/* Auto Redirect Notice */}
