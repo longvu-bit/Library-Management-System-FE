@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import {
   Menu,
   X,
@@ -18,6 +18,8 @@ import {
   LogOut,
   ChevronDown,
 } from 'lucide-react'
+import { logoutAPI } from '../apis/auth'
+import { toast } from 'react-toastify'
 
 const AdminHeader = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -62,6 +64,14 @@ const AdminHeader = () => {
 
   const isActiveRoute = (href) => {
     return location.pathname === href
+  }
+
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    logoutAPI()
+
+    navigate('/login')
+    toast.success('Đăng xuất thành công')
   }
 
   return (
@@ -179,7 +189,10 @@ const AdminHeader = () => {
                       <Settings className="h-4 w-4 mr-3" />
                       Cài đặt
                     </Link>
-                    <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
                       <LogOut className="h-4 w-4 mr-3" />
                       Đăng xuất
                     </button>

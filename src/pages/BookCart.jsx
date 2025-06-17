@@ -27,9 +27,12 @@ import {
 import { useForm } from 'react-hook-form'
 import { formatDate } from '../utils/formatters'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router'
 
 const BookCart = () => {
   const userInfo = JSON.parse(localStorage.getItem('user'))
+
+  const navigate = useNavigate()
 
   const {
     register,
@@ -89,12 +92,15 @@ const BookCart = () => {
       booksId.push(book.book._id)
     })
 
+    console.log(booksBorrow)
+
     toast
       .promise(createBorrowBooksClientAPI({ booksBorrow }), {
         pending: 'Borrowing ...',
       })
       .then(() => {
         setAvailableItems((prev) => prev.filter((item) => !booksId.includes(item.book._id)))
+        navigate('/books/history')
         toast.success('Đăng ký mượn sách thành công')
       })
   }

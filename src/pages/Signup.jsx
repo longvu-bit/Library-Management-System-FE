@@ -25,6 +25,7 @@ const Signup = () => {
       })
       .then((res) => {
         navigate(`/login?registeredEmail=${res.email}`)
+        toast.success('Đăng ký thành công')
       })
   }
 

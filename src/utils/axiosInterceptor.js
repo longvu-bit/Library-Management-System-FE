@@ -6,7 +6,7 @@ import { logoutAPI, refreshTokenAPI } from '../apis/auth'
 
 let axiosInstance = axios.create()
 
-axiosInstance.defaults.baseURL = 'http://localhost:8017/api'
+axiosInstance.defaults.baseURL = 'http://localhost:8088/api'
 
 axiosInstance.defaults.timeout = 1000 * 60 * 10
 
@@ -18,10 +18,11 @@ axiosInstance.interceptors.request.use(
     interceptorLoadingElements(true)
 
     const accessToken = localStorage.getItem('accessToken')
+    const refreshToken = localStorage.getItem('refreshToken')
 
-    if (accessToken) {
+    if (accessToken && refreshToken) {
       config.headers.authorization = `Bearer ${accessToken}`
-      console.log(config.headers.authorization)
+      config.headers.refreshToken = refreshToken
     }
 
     return config
@@ -45,12 +46,17 @@ axiosInstance.interceptors.response.use(
     interceptorLoadingElements(false)
 
     // UNAUTHORIZED
-    // if (error.response?.status === 401) {
-    //   logoutAPI()
-    // }
+    if (error.response?.status === 401) {
+      logoutAPI()
+    }
+
+    //FORBIDDEN
+    if (error.response?.status === 403) {
+      location.href = '/access-denied'
+    }
 
     // const originalRequests = error.config
-    // if (error.response?.status === 410 && originalRequests) {
+    // if (error.response?.status === 410) {
     //   if (!refreshTokenPromise) {
     //     refreshTokenPromise = refreshTokenAPI()
     //       .then((res) => {
@@ -70,6 +76,9 @@ axiosInstance.interceptors.response.use(
     //      * B1: Doi voi du an can luu accessToken vao localStorage hoac o dau do thi viet them o day
     //      * Hien tai ko can vi BE su dung httpOnly
     //      */
+
+    //     if (!originalRequests.headers) originalRequests.headers = {}
+
     //     originalRequests.headers.authorization = `Bearer ${accessToken}`
     //     localStorage.setItem('accessToken', accessToken)
 
