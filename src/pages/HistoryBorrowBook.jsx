@@ -67,44 +67,47 @@ const HistoryBorrowBook = () => {
     })
   }
 
-  const getStatusInfo = (status, dueDate) => {
-    const now = new Date()
-    const due = new Date(dueDate)
+const getStatusInfo = (status, dueDate) => {
+  const now = new Date()
+  const due = new Date(dueDate)
+  
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate())
 
-    switch (status) {
-      case 'returned':
-        return {
-          label: 'Đã trả',
-          color: 'bg-green-100 text-green-800',
-          icon: CheckCircle,
-        }
-      case 'borrowed':
-        if (now > due) {
-          return {
-            label: 'Quá hạn',
-            color: 'bg-red-100 text-red-800',
-            icon: XCircle,
-          }
-        }
-        return {
-          label: 'Đang mượn',
-          color: 'bg-blue-100 text-blue-800',
-          icon: Clock,
-        }
-      case 'overdue':
+  switch (status) {
+    case 'returned':
+      return {
+        label: 'Đã trả',
+        color: 'bg-green-100 text-green-800',
+        icon: CheckCircle,
+      }
+    case 'borrowed':
+      if (today > dueDay) {
         return {
           label: 'Quá hạn',
           color: 'bg-red-100 text-red-800',
-          icon: AlertTriangle,
-        }
-      default:
-        return {
-          label: 'Không xác định',
-          color: 'bg-gray-100 text-gray-800',
           icon: XCircle,
         }
-    }
+      }
+      return {
+        label: 'Đang mượn',
+        color: 'bg-blue-100 text-blue-800',
+        icon: Clock,
+      }
+    case 'overdue':
+      return {
+        label: 'Quá hạn',
+        color: 'bg-red-100 text-red-800',
+        icon: AlertTriangle,
+      }
+    default:
+      return {
+        label: 'Không xác định',
+        color: 'bg-gray-100 text-gray-800',
+        icon: XCircle,
+      }
   }
+}
 
   const getDaysRemaining = (dueDate, status) => {
     if (status === 'returned') return null
