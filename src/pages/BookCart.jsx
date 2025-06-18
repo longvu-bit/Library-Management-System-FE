@@ -210,6 +210,7 @@ const BookCart = () => {
                 </div>
 
                 <div className="space-y-4">
+                  {console.log(availableItems)}
                   {availableItems.map((item) => (
                     <div
                       key={item._id}

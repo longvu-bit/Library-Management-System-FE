@@ -50,7 +50,7 @@ const HistoryBorrowBook = () => {
     const filtered = borrowedBooks.filter((record) => {
       const matchesSearch =
         (record.bookSnapshot?.title ?? record.book.title).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (record.bookSnapshot?.author ?? record.book.author.name).toLowerCase().includes(searchTerm.toLowerCase())
+        (record.bookSnapshot?.author.name ?? record.book.author.name).toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = statusFilter === 'all' || record.status === statusFilter
       return matchesSearch && matchesStatus
     })
@@ -240,6 +240,7 @@ const getStatusInfo = (status, dueDate) => {
       <div className="space-y-4">
         {console.log(filteredBooks)}
         {filteredBooks.map((record) => {
+          
           const statusInfo = getStatusInfo(record.status, record.dueDate)
           const StatusIcon = statusInfo.icon
           const daysRemaining = getDaysRemaining(record.dueDate, record.status)
@@ -271,11 +272,11 @@ const getStatusInfo = (status, dueDate) => {
                         <div className="flex items-center gap-4 text-gray-600 mb-3">
                           <div className="flex items-center gap-1">
                             <User className="h-4 w-4" />
-                            <span className="text-sm">{record.bookSnapshot?.author ?? record.book?.author.name}</span>
+                            <span className="text-sm">{record.bookSnapshot?.author?.name ?? record.book?.author?.name}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Package className="h-4 w-4" />
-                            <span className="text-sm">{record.bookSnapshot?.category ?? record.book?.category.name}</span>
+                            <span className="text-sm">{record.bookSnapshot?.category?.name ?? record.book?.category?.name}</span>
                           </div>
                         </div>
 
