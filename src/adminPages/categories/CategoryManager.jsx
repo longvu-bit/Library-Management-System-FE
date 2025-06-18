@@ -94,7 +94,7 @@ const CategoryManager = () => {
   }
 
   return (
-    <div className="category-manager  mx-auto p-6">
+    <div className="category-manager  mx-auto p-6 container-admin">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Quản lý danh mục</h1>
         <button

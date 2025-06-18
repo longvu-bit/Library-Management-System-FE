@@ -120,7 +120,7 @@ const PublisherManager = () => {
   }
 
   return (
-    <div className="publisher-manager mx-auto p-6">
+    <div className="publisher-manager mx-auto p-6 container-admin">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Quản lý nhà xuất bản</h1>
         <button
@@ -156,19 +156,18 @@ const PublisherManager = () => {
       </div>
 
       {/* Search Bar */}
-        <div className="mb-8 flex justify-start">
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm theo tên..."
-              value={searchPublisher}
-              onChange={(e) => setSearchPublisher(e.target.value)}
-              className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
-            />
-          </div>
+      <div className="mb-8 flex justify-start">
+        <div className="relative w-full max-w-md">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên..."
+            value={searchPublisher}
+            onChange={(e) => setSearchPublisher(e.target.value)}
+            className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+          />
         </div>
-
+      </div>
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="overflow-x-auto">

@@ -115,7 +115,7 @@ const UserManager = () => {
   }
 
   return (
-    <div className="user-manager mx-auto p-6">
+    <div className="user-manager mx-auto p-6 container-admin">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Quản lý người dùng</h1>
         <button
@@ -141,19 +141,19 @@ const UserManager = () => {
       </div>
 
       {/* Search Bar */}
-      
+
       <div className="mb-8">
-          <div className="relative max-w-md">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm theo tên, email hoặc số điện thoại..."
-              value={searchUser}
-              onChange={(e) => setSearchUser(e.target.value)}
-              className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
-            />
-          </div>
+        <div className="relative max-w-md">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên, email hoặc số điện thoại..."
+            value={searchUser}
+            onChange={(e) => setSearchUser(e.target.value)}
+            className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+          />
         </div>
+      </div>
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
