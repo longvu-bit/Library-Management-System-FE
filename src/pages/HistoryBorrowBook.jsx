@@ -49,8 +49,8 @@ const HistoryBorrowBook = () => {
     // Filter books based on search term and status
     const filtered = borrowedBooks.filter((record) => {
       const matchesSearch =
-        record.book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        record.book.author.name.toLowerCase().includes(searchTerm.toLowerCase())
+        (record.bookSnapshot?.title ?? record.book.title).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (record.bookSnapshot?.author ?? record.book.author.name).toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = statusFilter === 'all' || record.status === statusFilter
       return matchesSearch && matchesStatus
     })
@@ -235,6 +235,7 @@ const HistoryBorrowBook = () => {
 
       {/* Books List */}
       <div className="space-y-4">
+        {console.log(filteredBooks)}
         {filteredBooks.map((record) => {
           const statusInfo = getStatusInfo(record.status, record.dueDate)
           const StatusIcon = statusInfo.icon
@@ -250,8 +251,8 @@ const HistoryBorrowBook = () => {
                   {/* Book Image */}
                   <div className="flex-shrink-0">
                     <img
-                      src={record.book.image[0] || '/placeholder.svg?height=150&width=100'}
-                      alt={record.book.title}
+                      src={record.bookSnapshot?.image[0] ?? record.book?.image[0] ?? '/placeholder.svg?height=150&width=100'}
+                      alt={record.bookSnapshot?.title ?? record.book?.title}
                       className="w-24 h-32 object-cover rounded-lg shadow-md"
                     />
                   </div>
@@ -261,17 +262,17 @@ const HistoryBorrowBook = () => {
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          {record.book.title}
+                          {record.bookSnapshot?.title ?? record.book?.title}
                         </h3>
 
                         <div className="flex items-center gap-4 text-gray-600 mb-3">
                           <div className="flex items-center gap-1">
                             <User className="h-4 w-4" />
-                            <span className="text-sm">{record.book.author.name}</span>
+                            <span className="text-sm">{record.bookSnapshot?.author ?? record.book?.author.name}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Package className="h-4 w-4" />
-                            <span className="text-sm">{record.book.category.name}</span>
+                            <span className="text-sm">{record.bookSnapshot?.category ?? record.book?.category.name}</span>
                           </div>
                         </div>
 

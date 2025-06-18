@@ -123,6 +123,8 @@ const AuthorManager = () => {
     console.log('View author details:', id)
   }
 
+
+
   return (
     <div className="author-manager  mx-auto p-6 z-0">
       {/* Show and hide modal create author */}
@@ -161,18 +163,18 @@ const AuthorManager = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="mb-6">
-        <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên tác giả..."
+      <div className="mb-8">
+          <div className="relative max-w-md">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên tác giả..."
             value={searchAuthor}
             onChange={(e) => setSearchAuthor(e.target.value)}
-            className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+              className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+            />
+          </div>
         </div>
-      </div>
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
