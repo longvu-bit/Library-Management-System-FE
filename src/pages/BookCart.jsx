@@ -138,7 +138,7 @@ const BookCart = () => {
       <div className="container mx-auto px-4 py-8 min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="flex flex-col items-center justify-center min-h-96">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-600 text-lg">Đang tải giỏ hàng...</p>
+          <p className="text-gray-600 text-lg">Đang tải giỏ sách...</p>
         </div>
       </div>
     )
@@ -151,9 +151,9 @@ const BookCart = () => {
           <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-6">
             <ShoppingCart className="h-12 w-12 text-blue-600" />
           </div>
-          <h2 className="text-3xl font-semibold text-gray-900 mb-4 text-center">Giỏ hàng trống</h2>
+          <h2 className="text-3xl font-semibold text-gray-900 mb-4 text-center">Giỏ sách trống</h2>
           <p className="text-gray-600 text-lg text-center mb-6">
-            Bạn chưa thêm sách nào vào giỏ hàng để mượn.
+            Bạn chưa thêm sách nào vào giỏ sách để mượn.
           </p>
           <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">
             <BookOpen className="h-5 w-5" />
@@ -170,10 +170,10 @@ const BookCart = () => {
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center flex items-center justify-center gap-3">
           <ShoppingCart className="h-10 w-10 text-blue-600" />
-          Giỏ hàng mượn sách
+          Giỏ sách
         </h1>
         <p className="text-gray-600 text-xl text-center">
-          Bạn có {cartItems.length} cuốn sách trong giỏ hàng
+          Bạn có {cartItems.length} cuốn sách trong giỏ sách
         </p>
       </div>
 

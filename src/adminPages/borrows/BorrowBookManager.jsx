@@ -102,10 +102,8 @@ const BorrowBookManager = () => {
   if (isError) return <div>Error: {error}</div>
 
   return (
-    <div className="history-manager  mx-auto p-6">
-      <h1 className="text-3xl  font-bold mb-8 text-gray-800">
-        Quản lý lịch sử mượn sách
-      </h1>
+    <div className="history-manager  mx-auto p-6 container-admin">
+      <h1 className="text-3xl  font-bold mb-8 text-gray-800">Quản lý lịch sử mượn sách</h1>
       {/* Statistics Card */}
       <div className="mb-6">
         <div className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
@@ -121,16 +119,16 @@ const BorrowBookManager = () => {
 
       {/* Search Bar */}
       <div className="mb-8">
-          <div className="relative max-w-md">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm theo tên người dùng hoặc tên sách..."
+        <div className="relative max-w-md">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên người dùng hoặc tên sách..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
-            />
-          </div>
+            className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+          />
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -174,13 +172,15 @@ const BorrowBookManager = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {console.log(records.borrowRecords)}
-              {records.borrowRecords.map((record,i) => (
+              {records.borrowRecords.map((record, i) => (
                 <tr key={record._id} className="hover:bg-gray-50 transition-colors duration-200">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{i+1}</div>
+                    <div className="text-sm font-medium text-gray-900">{i + 1}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{record.user?.name ?? record.userSnapshot?.name}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {record.user?.name ?? record.userSnapshot?.name}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div

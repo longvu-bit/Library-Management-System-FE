@@ -6,7 +6,7 @@ import { logoutAPI, refreshTokenAPI } from '../apis/auth'
 
 let axiosInstance = axios.create()
 
-axiosInstance.defaults.baseURL = 'http://localhost:8017/api'
+axiosInstance.defaults.baseURL = 'http://localhost:8081/api'
 
 axiosInstance.defaults.timeout = 1000 * 60 * 10
 

@@ -11,6 +11,11 @@
   padding: 0.5rem;
 }
 
+.container-admin {
+  width: 1200px;
+  height: fit-content;
+}
+
 .list-books {
   margin-top: 1rem;
 }
